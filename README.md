@@ -1,5 +1,5 @@
-Crowdtruth-mturk
-================
+Crowdtruth-crowdflower
+======================
 
 Extension for the CrowdWatson framework that adds Crowdflower as a platform.
 
