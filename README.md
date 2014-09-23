@@ -9,6 +9,6 @@ Notice that you must configure the package to provide the API key for your Crowd
     $ php artisan config:publish crowdtruth/crowdflower
 ```
 
-Afterwards you should edit file *vendor/crowdtruth/crowdflower/src/config/config.php* as required. In particular, you need to provide your apikey.
+Afterwards you should edit file *app/config/packages/crowdtruth/crowdflower/config.php* as required. In particular, you need to provide your apikey.
 
 For more information visit: http://crowdtruth.org/
