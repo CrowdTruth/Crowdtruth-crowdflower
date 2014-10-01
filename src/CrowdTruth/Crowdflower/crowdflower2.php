@@ -54,7 +54,7 @@ class Crowdflower2 extends \FrameWork {
 		}
 			
 		return $jc;
-	}
+	} 
 
 	/**
 	* @return 
@@ -255,8 +255,8 @@ class Crowdflower2 extends \FrameWork {
 
 		// dd($jc);
 		//dd($result['result']['title']);
-
-		$this->CFDataToJobConf($result['result'], $jc);
+		$status = null;
+		$this->CFDataToJobConf($result['result'], $jc, $status);
 		
 		$jc->update();
 
@@ -274,17 +274,19 @@ class Crowdflower2 extends \FrameWork {
                 $job->expectedWorkerunitsCount=$unitsCount*$jc->content['workerunitsPerUnit'];
                 $job->projectedCost = $projectedCost;
             }
+        if(isset($status))
+        	$job->status = $status;
         $job->update();
 	}
 
-	 private function CFDataToJobConf($CFd, &$jc){ // TODO
+	 private function CFDataToJobConf($CFd, &$jc, &$status){ // TODO
 		$jcco = $jc->content;
-		if(isset($CFd['title']))  				$jcco['title'] = 				$CFd['title'];
+		//if(isset($CFd['title']))  				$jcco['title'] = 				$CFd['title'];
 		if(isset($CFd['instructions'])) 		$jcco['instructions'] =			$CFd['instructions'];
 		if(isset($CFd['css'])) 					$jcco['css'] =					$CFd['css'];
 		if(isset($CFd['cml'])) 					$jcco['cml'] =					$CFd['cml'];
 		if(isset($CFd['js'])) 					$jcco['js'] =					$CFd['js'];
-		if(isset($CFd['state'])) 				$jcco['status'] =				$CFd['state'];
+		if(isset($CFd['state'])) 				$status  =				$CFd['state'];
 		if(isset($CFd['payment_cents'])) 		$jcco['reward'] =				$CFd['payment_cents']/100;
 		if(isset($CFd['minimum_requirements'])) 		$jcco['minimumRequirements'] =				$CFd['minimum_requirements'];
 
@@ -310,7 +312,7 @@ class Crowdflower2 extends \FrameWork {
 		if(isset($jc['cml'])) 			 		$data['cml']					 	= $jc['cml'];
 		if(isset($jc['js'])) 			 		$data['js']					 		= $jc['js'];
 		//if(isset($jc['reward'])) 			 	$data['payment_cents']		 		= $jc['reward'];
-
+		//if(isset($jc['notificationEmail'])) 		$data = 			$jc['notificationEmail'];
 		if(isset($jc['instructions'])) 			$data['instructions']				= $jc['instructions'];
 		if(isset($jc['workerunitsPerUnit'])) 	$data['judgments_per_unit']		  	= $jc['workerunitsPerUnit'];
 		if(isset($jc['unitsPerTask']))			$data['units_per_assignment']		= $jc['unitsPerTask'];
@@ -423,6 +425,43 @@ class Crowdflower2 extends \FrameWork {
 		$result = $this->CFJob->cancelJob($id);
 		if(isset($result['result']['error']['message']))
 			throw new Exception("Cancel: " . $result['result']['error']['message']);
+	}
+
+	public function deleteJob($id){
+		//$this->hasStateOrFail($id, 'running'); // Rules?
+		$result = $this->CFJob->deleteJob($id);
+		if(isset($result['result']['error']['message']))
+			throw new Exception("Delete: " . $result['result']['error']['message']);
+		$job = \MongoDB\Entity::where('platformJobId', $id)->first();
+		
+		$jc = \MongoDB\Entity::where('_id', $job->jobConf_id)->first();
+		$ac = \MongoDB\Activity::where('_id', $job->activity_id)->first();
+		$job->forceDelete();
+		$jc->forceDelete();
+		$ac->forceDelete();
+
+	}
+
+	public function deleteJobCT($id){
+		//$this->hasStateOrFail($id, 'running'); // Rules?
+		
+		$job = \MongoDB\Entity::where('platformJobId', $id)->first();
+		
+		$jc = \MongoDB\Entity::where('_id', $job->jobConf_id)->first();
+		$ac = \MongoDB\Activity::where('_id', $job->activity_id)->first();
+		$job->forceDelete();
+		$jc->forceDelete();
+		$ac->forceDelete();
+ 
+	}
+ 
+	public function deleteJobPL($id){
+		//$this->hasStateOrFail($id, 'running'); // Rules?
+		$result = $this->CFJob->deleteJob($id);
+		if(isset($result['result']['error']['message']))
+			throw new Exception("Delete: " . $result['result']['error']['message']);
+
+
 	}
 
 	private function hasStateOrFail($id, $state){
