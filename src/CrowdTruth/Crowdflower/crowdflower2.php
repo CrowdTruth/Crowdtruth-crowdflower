@@ -241,8 +241,31 @@ class Crowdflower2 extends \FrameWork {
 		} 
     }
 
+	 //private function validateVariation($vcurr, $vnew){
+	// 	return true
 
+	// }
 
+ //    private function validateTitle($tcurr, $tnew){
+ //    	$pos = strpos($tnew, '[[');
+	//     	if ($pos!==false and $pos > 0) {
+	//     		$t_title = trim(substr($value, 0, $pos));
+	//     		$t_1 = substr($tnew, $pos + 2);
+	//     		$pos2new = strpos($t_1, '(entity/' );
+	//     		$pos2curr = strpos($tcurr, '(entity/' );	
+	// 			if ($pos2!==false and $pos >= 0) {
+	// 				$t_name = substr($t_1, 0, $pos2-2);
+	// 				$suffnew = substr()
+	// 				if(not validateVariation())
+	// 					return false;
+	// 				if( 0 != strcmp())
+	// 					return false;
+
+	// 			}
+	// 			else return false;
+	//     	}
+	//     	else return false;
+ //    }
 
 	public function refreshJob($id){
 		
@@ -256,6 +279,7 @@ class Crowdflower2 extends \FrameWork {
 		// dd($jc);
 		//dd($result['result']['title']);
 		$status = null;
+
 		$this->CFDataToJobConf($result['result'], $jc, $status);
 		
 		$jc->update();
@@ -281,7 +305,18 @@ class Crowdflower2 extends \FrameWork {
 
 	 private function CFDataToJobConf($CFd, &$jc, &$status){ // TODO
 		$jcco = $jc->content;
-		//if(isset($CFd['title']))  				$jcco['title'] = 				$CFd['title'];
+		if(isset($CFd['title'])){  	
+			$pos = strpos($CFd['title'], '[[');
+	     	if ($pos!==false and $pos > 0) {
+	     		if(0 == strcmp(substr($CFd['title'], $pos), '[[' .$jcco['type']))		
+	     			$jcco['title'] = 				$CFd['title']. substr($jcco['title'], strpos($jcco['title'], '(entity/' ));
+	     		else
+	     			throw new Exception("Wrong type");
+	     	}
+	    else
+			throw new Exception("Missing '[['");
+		}
+
 		if(isset($CFd['instructions'])) 		$jcco['instructions'] =			$CFd['instructions'];
 		if(isset($CFd['css'])) 					$jcco['css'] =					$CFd['css'];
 		if(isset($CFd['cml'])) 					$jcco['cml'] =					$CFd['cml'];
@@ -307,7 +342,10 @@ class Crowdflower2 extends \FrameWork {
 		$jc=$jc->content;
 		$data = array();
 		//if(isset($jc['keywords'])) 			 	$data['tags']					 	= $jc['keywords'];
-		if(isset($jc['title'])) 			 	$data['title']					 	= $jc['title'];
+		if(isset($jc['title'])) 			 	$data['title']					 	= substr($jc['title'], 0, strpos($jc['title'], '(entity/' ));
+	//     		$pos2curr = strpos($tcurr, '(entity/' );	
+	// 			if ($pos2!==false and $pos >= 0) {
+	// 				$t_name = substr($t_1, 0, $pos2-2);;
 		if(isset($jc['css'])) 			 		$data['css']					 	= $jc['css'];
 		if(isset($jc['cml'])) 			 		$data['cml']					 	= $jc['cml'];
 		if(isset($jc['js'])) 			 		$data['js']					 		= $jc['js'];
