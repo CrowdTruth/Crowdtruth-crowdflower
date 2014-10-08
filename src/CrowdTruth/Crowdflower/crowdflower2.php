@@ -484,7 +484,6 @@ class Crowdflower2 extends \FrameWork {
 		//$this->hasStateOrFail($id, 'running'); // Rules?
 		
 		$job = \MongoDB\Entity::where('platformJobId', $id)->first();
-		
 		$jc = \MongoDB\Entity::where('_id', $job->jobConf_id)->first();
 		$ac = \MongoDB\Activity::where('_id', $job->activity_id)->first();
 		$job->forceDelete();
