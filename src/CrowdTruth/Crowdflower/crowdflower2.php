@@ -83,6 +83,19 @@ class Crowdflower2 extends \FrameWork {
 	}
 
 
+	public function cfUpdate($id, $jc){
+		$data = $this->jobConfToCFData($jc);
+		try {
+			$result = $this->CFJob->updateJob($id, $data);
+
+			// 	dd($result);
+			if(isset($result['result']['errors']))
+					throw new CFExceptions($result['result']['errors'][0]); 
+		}
+		catch (Exception $e) {
+			throw new Exception("not sent to CF: ". $e->getMessage());
+		}
+	}
 
 
 	/**
