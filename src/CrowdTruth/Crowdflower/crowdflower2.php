@@ -254,31 +254,6 @@ class Crowdflower2 extends \FrameWork {
 		} 
     }
 
-	 //private function validateVariation($vcurr, $vnew){
-	// 	return true
-
-	// }
-
- //    private function validateTitle($tcurr, $tnew){
- //    	$pos = strpos($tnew, '[[');
-	//     	if ($pos!==false and $pos > 0) {
-	//     		$t_title = trim(substr($value, 0, $pos));
-	//     		$t_1 = substr($tnew, $pos + 2);
-	//     		$pos2new = strpos($t_1, '(entity/' );
-	//     		$pos2curr = strpos($tcurr, '(entity/' );	
-	// 			if ($pos2!==false and $pos >= 0) {
-	// 				$t_name = substr($t_1, 0, $pos2-2);
-	// 				$suffnew = substr()
-	// 				if(not validateVariation())
-	// 					return false;
-	// 				if( 0 != strcmp())
-	// 					return false;
-
-	// 			}
-	// 			else return false;
-	//     	}
-	//     	else return false;
- //    }
 
 	public function refreshJob($id){
 		
@@ -316,7 +291,7 @@ class Crowdflower2 extends \FrameWork {
         $job->update();
 	}
 
-	 private function CFDataToJobConf($CFd, &$jc, &$status){ // TODO
+	 private function CFDataToJobConf($CFd, &$jc, &$status){ 
 		$jcco = $jc->content;
 		if(isset($CFd['title'])){  	
 			$pos = strpos($CFd['title'], '[[');
@@ -356,9 +331,6 @@ class Crowdflower2 extends \FrameWork {
 		$data = array();
 		//if(isset($jc['keywords'])) 			 	$data['tags']					 	= $jc['keywords'];
 		if(isset($jc['title'])) 			 	$data['title']					 	= substr($jc['title'], 0, strpos($jc['title'], '(entity/' ));
-	//     		$pos2curr = strpos($tcurr, '(entity/' );	
-	// 			if ($pos2!==false and $pos >= 0) {
-	// 				$t_name = substr($t_1, 0, $pos2-2);;
 		if(isset($jc['css'])) 			 		$data['css']					 	= $jc['css'];
 		if(isset($jc['cml'])) 			 		$data['cml']					 	= $jc['cml'];
 		if(isset($jc['js'])) 			 		$data['js']					 		= $jc['js'];
@@ -406,24 +378,6 @@ class Crowdflower2 extends \FrameWork {
 		
 		foreach ($units as $unit){
 			unset($unit['content']['properties']);
-
-/*
-			if(!isset($unit['content']['sentence']['formatted']))// TODO SHOULDN'T HAPPEN!!!!
-				$unit['content']['sentence']['formatted'] = $unit['content']['sentence']['text'];*/
-
-/*			$c = array_change_key_case(array_dot($row['content']), CASE_LOWER);
-			foreach($c as $key=>$val){
-				$key = strtolower(str_replace('.', '_', $key));
-				if(isset($replaceValues[$key][$val]))
-					$val = $replaceValues[$key][$val];
-				
-				$content[$key] = $val;
-			}*/
-			//$content = $questionTemplate->flattenAndReplace($unit['content']);
-
-			// Add fields
-			//if ($unit['format'] === "image")
-			//	$content['url'] = $unit['content']['url'];
 
 			$c = array_change_key_case(array_dot($unit['content']), CASE_LOWER);
 			foreach($c as $key=>$val){
