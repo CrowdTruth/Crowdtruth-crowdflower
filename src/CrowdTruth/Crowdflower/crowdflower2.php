@@ -132,8 +132,9 @@ class Crowdflower2 extends \FrameWork {
 
 			// Create the job with the initial data
 			$result = $this->CFJob->createJob($data);
-			$id = $result['result']['id'];
-
+			if(isset($result['result']) && isset($result['result']['id'] )){
+				$id = $result['result']['id'];
+			}
 			// Add CSV and options
 			if(isset($id)) {
 				
@@ -273,19 +274,19 @@ class Crowdflower2 extends \FrameWork {
 		$jc->update();
 
 		//dd($jc);
-		if(!isset($job->projectedCost)){
-				$reward = $jc->content['reward'];
-				$workerunitsPerUnit = intval($jc->content['workerunitsPerUnit']);
-				$unitsPerTask = intval($jc->content['unitsPerTask']);
-				$unitsCount = count($batch->wasDerivedFrom);
-                if(!$unitsPerTask)
-                    $projectedCost = 0;
-                else
-				    $projectedCost = round(($reward/$unitsPerTask)*($unitsCount*$workerunitsPerUnit), 2);
+		//if(!isset($job->projectedCost)){
+		$reward = $jc->content['reward'];
+		$workerunitsPerUnit = intval($jc->content['workerunitsPerUnit']);
+		$unitsPerTask = intval($jc->content['unitsPerTask']);
+		$unitsCount = count($batch->wasDerivedFrom);
+        if(!$unitsPerTask)
+            $projectedCost = 0;
+        else
+		    $projectedCost = round(($reward/$unitsPerTask)*($unitsCount*$workerunitsPerUnit), 2);
 
-                $job->expectedWorkerunitsCount=$unitsCount*$jc->content['workerunitsPerUnit'];
-                $job->projectedCost = $projectedCost;
-            }
+        $job->expectedWorkerunitsCount=$unitsCount*$jc->content['workerunitsPerUnit'];
+        $job->projectedCost = $projectedCost;
+        //    }
         if(isset($status))
         	$job->status = $status;
         $job->update();
