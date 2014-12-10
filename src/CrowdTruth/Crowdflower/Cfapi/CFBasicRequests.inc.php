@@ -1,11 +1,10 @@
 <?php
 namespace CrowdTruth\Crowdflower\Cfapi;
 require_once 'CFAddFunctions.php';
-
 class CFBasicRequests {
 	private $content_header = array("Accept" => "application/json");
 	private $upload_header = array("Content-Type" => "text/csv");
-        private $api_key = "";
+    private $api_key = "";
 	private $url = "http://api.crowdflower.com/v1/";
 	private $reference_resource = "";
 	private $current_resource = "";
@@ -24,11 +23,9 @@ class CFBasicRequests {
   	public function curlRequest($url, $method, $data) {
 		$url .= "?key=" . $this->getApiKey();
 	    	$ch = curl_init();
-
 		$this->setRequestHeaders($method, $ch);
 		$this->setRequestMethod($method, $data, $ch);
 		$this->setRequestOptions($url, $data, $ch);
-
 		$result = objectToArray(json_decode(curl_exec($ch)));
         	$info = $this->getInfo($ch);
        		$error = $this->getError($ch);
@@ -36,13 +33,11 @@ class CFBasicRequests {
         	curl_close($ch);
 		if (is_resource($this->fh))
 			fclose($this->fh);
-
 		$retValue["result"] = $result;
 		$retValue["error"] = $error; 
 		$retValue["info"] = $info;
         	return $retValue;
 	}
-
 	/**
         * Set the options for the cURL request to CrowdFlower.
         * @param $url (request uri)
@@ -61,7 +56,6 @@ class CFBasicRequests {
         	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_URL, $url);
 	}
-
 	/**
         * Set the headers for the cURL request to CrowdFlower.
 	* @param $method (request method: GET, POST, PUT, UPLOAD)
@@ -83,6 +77,7 @@ class CFBasicRequests {
         	curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);        
 	}
 
+
 	/**
         * Set the method for the cURL request to CrowdFlower.
 	* @param $method (request method: GET, POST, PUT, UPLOAD)
@@ -98,6 +93,7 @@ class CFBasicRequests {
 			$this->fh = fopen($data['file_path'], 'r');
 			curl_setopt($ch, CURLOPT_INFILE, $this->fh);
 			curl_setopt($ch, CURLOPT_INFILESIZE, filesize($data['file_path']));
+			rewind($this->fh);
 		} else {
 			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
        	}
@@ -111,7 +107,6 @@ class CFBasicRequests {
 	function getInfo($ch){
         	return curl_getinfo($ch);
 	}
-
 	/**
         * Return possible errors of the cURL request to CrowdFlower.
 	* @param $ch (cURL request) 
@@ -120,7 +115,6 @@ class CFBasicRequests {
 	function getError($ch) {
 	        return curl_errno($ch) ? curl_error($ch) : false;
 	}
-
 	public function setHeaders($headers) {
     		$this->headers = $headers;
   	}
@@ -148,23 +142,14 @@ class CFBasicRequests {
   	public function setCurrentResource($current_resource) {
       		$this->current_resource = $current_resource;
   	}
-
   	public function getCurrentResource() {
       		return $this->current_resource;
   	}
-
   	public function setReferenceResource($reference_resource) {
       		$this->reference_resource = $reference_resource;
   	}
-
   	public function getReferenceResource() {
       		return $this->reference_resource;
   	}
-
 }
-
-
-
 ?>
-
-

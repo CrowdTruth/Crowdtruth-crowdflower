@@ -102,7 +102,7 @@ class Job extends CFBasicRequests {
 		return $result;
 	}
 	
-	/**
+		/**
     * Create a CrowdFlower job.
     * @param string $data (fields that can be part of the data: title, judgments_per_unit, max_judgments_per_worker, units_per_assignment, max_judgments_per_ip, webhook_uri, send_judgments_webhook => true, payment_cents, instructions, css, js, cml)
     * @return Array $result (answer returned by the cURL request) => from here we can extract the id of the job just created
@@ -114,7 +114,6 @@ class Job extends CFBasicRequests {
 		$result = $this->curlRequest($url, "POST", prefixData($data, "job"));
 		return $result;	
 	}
-
 	/**
     * Update an existing CrowdFlower job.
     * @param string $job_id 
@@ -128,7 +127,6 @@ class Job extends CFBasicRequests {
 		$result = $this->curlRequest($url, "PUT", prefixData($data, "job"));
 		return $result;	
 	}
-
 	/**
     * Add data to an existing job by uploading a CSV file.
     * @param string $job_id 
@@ -140,6 +138,13 @@ class Job extends CFBasicRequests {
 	public function uploadInputFile($job_id, $file_path) {
 		$data['file_path'] = $file_path;
 		$url = $this->getRequestURL() . $this->getReferenceResource() . "/" . $job_id . "/upload.json";
+		$result = $this->curlRequest($url, "UPLOAD", $data);
+		return $result;	
+	}
+
+	public function createJobAndUploadInputFile($file_path) {
+		$data['file_path'] = $file_path;
+		$url = $this->getRequestURL() . $this->getReferenceResource() . "/upload";
 		$result = $this->curlRequest($url, "UPLOAD", $data);
 		return $result;	
 	}
