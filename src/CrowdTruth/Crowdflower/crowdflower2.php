@@ -112,12 +112,6 @@ private function cfPublish($job, $sandbox){
 					print_r($result);
 				}	
 
-			//	$curlReq = "curl -T '" . $csv . "' -H 'Content-Type: text/csv' http://api.crowdflower.com/v1/jobs/" . $id . "/upload.json?key=H_MX6QhTNBmSE-zdsqd1";
-				
-			//	$result = exec($curlReq, $output);
-
-			//	dd($output);
-
 				$csvresult = $this->CFJob->uploadInputFile($id, $csv);
 				if(!$debug) unlink($csv); // DELETE temporary CSV.
 				if($debug) {

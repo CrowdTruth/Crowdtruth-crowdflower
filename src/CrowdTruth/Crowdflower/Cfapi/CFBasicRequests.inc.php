@@ -22,6 +22,10 @@ class CFBasicRequests {
         */
   	public function curlRequest($url, $method, $data) {
 		$url .= "?key=" . $this->getApiKey();
+
+		if ($method == "UPLOAD") {
+			$url .= "&force=true";
+		}
 	    	$ch = curl_init();
 		$this->setRequestHeaders($method, $ch);
 		$this->setRequestMethod($method, $data, $ch);
