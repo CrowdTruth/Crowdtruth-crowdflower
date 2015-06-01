@@ -1,6 +1,5 @@
 <?php
 
-
 namespace CrowdTruth\Crowdflower;
 
 use Illuminate\Support\ServiceProvider;
@@ -22,11 +21,6 @@ class CrowdflowerServiceProvider extends ServiceProvider {
 	 */
 	public function boot() {
 		$this->package ( 'crowdtruth/crowdflower' );
-		// Register the cf:retrievejobs command
-		$this->app ['cf.retrievejobs'] = $this->app->share ( function () {
-			return new RetrieveJobs ();
-		} );
-		$this->commands ( 'cf.retrievejobs' );
 		$this->app ['cf2.retrievejobs'] = $this->app->share ( function () {
 			return new RetrieveJobs ();
 		} );
@@ -39,9 +33,10 @@ class CrowdflowerServiceProvider extends ServiceProvider {
 		} );
 		
 		// Important! Bind the shorthand name of the platform. This should be the same as the name in App/config/config.php.
-		$this->app->bind ( 'cf', function () {
-			return new Crowdflower ();
-		} );
+		// $this->app->bind('cf', function()
+		// {
+		// return new Crowdflower;
+		// });
 		$this->app->bind ( 'cf2', function () {
 			return new Crowdflower2 ();
 		} );
