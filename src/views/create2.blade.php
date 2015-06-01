@@ -36,7 +36,7 @@
 							</fieldset><br>	
 						</div>
 						{{ Form::submit('Next', array('class' => 'btn btn-lg btn-primary pull-right')); }}
-						{{ Form::close()}}					
+						{{ Form::close()}}
 					</div>
 				</div>
 			</div>	

@@ -59,37 +59,35 @@ class RetrieveJobs extends Command {
 				// For this, we should add ifexists checks in the storeJudgment method.
 				$cfjobid = $this->option('jobid');
 				$cf = new CrowdTruth\Crowdflower\Cfapi\Job(Config::get('crowdflower::apikey'));
-				$judgments = ''; //todo			
+				$judgments = ''; //todo
 			}
 
 			if($this->option('judgments')) {
 				$judgments = unserialize($this->option('judgments'));
 				$cfjobid = $judgments[0]['job_id']; // We assume that all judgments have the same jobic
 			}
-			
+
 			$judgment = $judgments[0];
 			$agentId = "crowdagent/cf/{$judgment['worker_id']}";
 			$ourjobid = $this->getJob($cfjobid)->_id;
 			$ourjobdomain = $this->getJob($cfjobid)->domain;
 			$ourjobformat = $this->getJob($cfjobid)->format;
 
-
 			// TODO: check if exists. How?
-			// For now this hacks helps: else a new activity would be created even if this 
+			// For now this hacks helps: else a new activity would be created even if this
 			// command was called as the job is finished. It doesn't work against manual calling the command though.
 			if($this->option('judgments')) {
 				try {
 					$activity = new Activity;
 					$activity->label = "Units are annotated on crowdsourcing platform.";
-					$activity->crowdAgent_id = $agentId; 
+					$activity->crowdAgent_id = $agentId;
 					$activity->used = $ourjobid;
 					$activity->softwareAgent_id = 'cf2';
 					$activity->save();
 				} catch (Exception $e) {
-                    if($activity) $activity->forceDelete();
-                    //if($workerunit) $workerunit->forceDelete();
-                    throw new Exception('Error saving activity for workerunit.');
-                }
+					if($activity) $activity->forceDelete();
+					throw new Exception('Error saving activity for workerunit.');
+				}
 			}
 
 			// Store judgments.
@@ -105,12 +103,12 @@ class RetrieveJobs extends Command {
 				$agent->country = $judgment['country'];
 				$agent->region = $judgment['region'];
 				$agent->city = $judgment['city'];
-			}	
-		
+			}
+
 			$agent->cfWorkerTrust = $judgment['worker_trust'];
 
 			Queue::push('Queues\UpdateCrowdAgent', array('crowdagent' => serialize($agent)));
-			
+
 			$job = $this->getJob($cfjobid);
 			Queue::push('Queues\UpdateJob', array('job' => serialize($job)));
 
@@ -123,13 +121,12 @@ class RetrieveJobs extends Command {
 			throw $e;
 		}
 		// If we throw an error, crowdflower will recieve HTTP 500 (internal server error) from us and try again.
-
-	}		
+	}
 
 	/**
-	* Retrieve Job from database. 
+	* Retrieve Job from database.
 	* @return Entity (documentType:job)
-	* @throws CFExceptions when no job is found. 
+	* @throws CFExceptions when no job is found.
 	*/
 	private function getJob($jobid){
 		if(!$job = Job::where('softwareAgent_id', 'cf2')
@@ -147,7 +144,7 @@ class RetrieveJobs extends Command {
 			throw new CFExceptions("CFJob not in local database; retrieving it would break provenance.");
 			// TODO discuss: we could also decide to create a new job with all the info we can get.
 		}
-		
+
 		return $job;
 	}
 
@@ -158,18 +155,17 @@ class RetrieveJobs extends Command {
 	private function storeJudgment($judgment, $ourjobid, $activityId, $agentId, $ourjobdomain, $ourjobformat)
 	{
 
-		// If exists return false. 
+		// If exists return false.
 		if(Workerunit::where('softwareAgent_id', 'cf2')
 			->where('platformWorkerunitId', $judgment['id'])
 			->first())
-			return false;	
+			return false;
 
 		try {
 			$workerunit = new Workerunit;
 			$workerunit->job_id = $ourjobid;
 			$workerunit->domain = $ourjobdomain;
 			$workerunit->format = $ourjobformat;
-			//$workerunit->platformJobId = $judgment['job_id'];
 			$workerunit->activity_id = $activityId;
 			$workerunit->crowdAgent_id = $agentId;
 			$workerunit->softwareAgent_id = 'cf2';
@@ -181,12 +177,11 @@ class RetrieveJobs extends Command {
 			$workerunit->cfTrust = $judgment['trust'];
 			$workerunit->content = $judgment['data'];
 			Queue::push('Queues\SaveWorkerunit', array('workerunit' => serialize($workerunit)));
-	
+
 			return $workerunit;
 			// TODO: golden
 
 			/*  Possibly also:
-
 				unit_state (but will be a hassle to update)
 				rejected
 				reviewed
@@ -194,7 +189,6 @@ class RetrieveJobs extends Command {
 				golden (todo!)
 				missed
 				webhook_sent_at
-
 			*/
 
 		} catch (Exception $e) {
@@ -212,9 +206,7 @@ class RetrieveJobs extends Command {
 	 */
 	protected function getArguments()
 	{
-		return array(
-			//array('jobid', InputArgument::OPTIONAL, 'An example argument.'),
-		);
+		return array();
 	}
 
 	/**
@@ -229,5 +221,4 @@ class RetrieveJobs extends Command {
 			array('jobid', null, InputOption::VALUE_OPTIONAL, 'CF Job ID.', null)
 		);
 	}
-
 }
