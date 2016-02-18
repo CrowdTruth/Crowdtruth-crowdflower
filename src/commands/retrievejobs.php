@@ -4,16 +4,16 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use CrowdTruth\Crowdflower\Cfapi\CFExceptions;
-use \MongoDB\Entity;
-use \Workerunit;
-use \MongoDB\CrowdAgent;
-use \MongoDB\Activity;
+use \Entities\Workerunit as Workerunit;
+use \CrowdAgent as CrowdAgent;
 use \MongoDB\Agent;
-use \Job;
+use \Entities\Job as Job;
 use \Log;
 use \QuestionTemplate;
 use \MongoDate;
 use \Queue;
+use \Entity as Entity;
+use \Activity as Activity;
 
 class RetrieveJobs extends Command {
 
