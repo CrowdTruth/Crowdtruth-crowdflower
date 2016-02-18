@@ -10,6 +10,9 @@ use \Input;
 use \CrowdTruth\Crowdflower\Cfapi\CFExceptions;
 use \CrowdTruth\Crowdflower\Cfapi\Job;
 use \CrowdTruth\Crowdflower\Cfapi\Worker;
+use \Entity as Entity;
+use \Activity as Activity;
+
 // use Job;
 class Crowdflower2 extends \FrameWork {
 	protected $CFJob = null;
@@ -222,9 +225,9 @@ class Crowdflower2 extends \FrameWork {
 		}
 	}
 	public function refreshJob($id) {
-		$job = \MongoDB\Entity::where ( '_id', $id )->first ();
-		$batch = \MongoDB\Entity::where ( '_id', $job->batch_id )->first ();
-		$jc = \MongoDB\Entity::where ( '_id', $job->jobConf_id )->first ();
+		$job = Entity::where ( '_id', $id )->first ();
+		$batch = Entity::where ( '_id', $job->batch_id )->first ();
+		$jc = Entity::where ( '_id', $job->jobConf_id )->first ();
 		$result = $this->CFJob->readJob ( $job->platformJobId );
 		if (isset ( $result ['result'] ['error'] ['message'] ))
 			throw new Exception ( "Read: " . $result ['result'] ['error'] ['message'] );
@@ -250,7 +253,7 @@ class Crowdflower2 extends \FrameWork {
 	}
 	private function CFDataToJobConf($CFd, &$jc, &$status) {
 		$jcco = $jc->content;
-		if (isset ( $CFd ['title'] )) {
+	/*	if (isset ( $CFd ['title'] )) {
 			$pos = strpos ( $CFd ['title'], '[[' );
 			if ($pos !== false && $pos > 0) {
 				if (0 == strcmp ( substr ( $CFd ['title'], $pos ), '[[' . $jcco ['type'] ))
@@ -260,6 +263,7 @@ class Crowdflower2 extends \FrameWork {
 			} else
 				throw new Exception ( "Missing '[['" );
 		}
+		*/
 		if (isset ( $CFd ['instructions'] ))
 			$jcco ['instructions'] = $CFd ['instructions'];
 		if (isset ( $CFd ['css'] ))
@@ -402,18 +406,18 @@ class Crowdflower2 extends \FrameWork {
 		$result = $this->CFJob->deleteJob ( $id );
 		if (isset ( $result ['result'] ['error'] ['message'] ))
 			throw new Exception ( "Delete: " . $result ['result'] ['error'] ['message'] );
-		$job = \MongoDB\Entity::where ( 'platformJobId', $id )->first ();
+		$job = Entity::where ( 'platformJobId', $id )->first ();
 		
-		$jc = \MongoDB\Entity::where ( '_id', $job->jobConf_id )->first ();
-		$ac = \MongoDB\Activity::where ( '_id', $job->activity_id )->first ();
+		$jc = Entity::where ( '_id', $job->jobConf_id )->first ();
+		$ac = Activity::where ( '_id', $job->activity_id )->first ();
 		$job->forceDelete ();
 		$jc->forceDelete ();
 		$ac->forceDelete ();
 	}
 	public function deleteJobCT($id) {
-		$job = \MongoDB\Entity::where ( 'platformJobId', $id )->first ();
-		$jc = \MongoDB\Entity::where ( '_id', $job->jobConf_id )->first ();
-		$ac = \MongoDB\Activity::where ( '_id', $job->activity_id )->first ();
+		$job = Entity::where ( 'platformJobId', $id )->first ();
+		$jc = Entity::where ( '_id', $job->jobConf_id )->first ();
+		$ac = Activity::where ( '_id', $job->activity_id )->first ();
 		$job->forceDelete ();
 		$jc->forceDelete ();
 		$ac->forceDelete ();
