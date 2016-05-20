@@ -22,7 +22,7 @@ class RetrieveJobs extends Command {
 	 *
 	 * @var string
 	 */
-	protected $name = 'cf2:retrievejobs';
+	protected $name = 'CF:retrievejobs';
 	//protected $name = 'cf:retrievejobs';
 
 	/**
@@ -68,10 +68,9 @@ class RetrieveJobs extends Command {
 			}
 
 			$judgment = $judgments[0];
-			$agentId = "crowdagent/cf/{$judgment['worker_id']}";
+			$agentId = "crowdagent/CF/{$judgment['worker_id']}";
 			$ourjobid = $this->getJob($cfjobid)->_id;
-			$ourjobdomain = $this->getJob($cfjobid)->domain;
-			$ourjobformat = $this->getJob($cfjobid)->format;
+
 
 			// TODO: check if exists. How?
 			// For now this hacks helps: else a new activity would be created even if this
@@ -82,7 +81,7 @@ class RetrieveJobs extends Command {
 					$activity->label = "Units are annotated on crowdsourcing platform.";
 					$activity->crowdAgent_id = $agentId;
 					$activity->used = $ourjobid;
-					$activity->softwareAgent_id = 'cf2';
+					$activity->softwareAgent_id = 'CF';
 					$activity->save();
 				} catch (Exception $e) {
 					if($activity) $activity->forceDelete();
@@ -92,13 +91,13 @@ class RetrieveJobs extends Command {
 
 			// Store judgments.
 			foreach($judgments as $judgment)
-				$this->storeJudgment($judgment, $ourjobid, $activity->_id, $agentId, $ourjobdomain, $ourjobformat);
+				$this->storeJudgment($judgment, $ourjobid, $activity->_id, $agentId);
 
 			// Create or update Agent
 			if(!$agent = CrowdAgent::id($agentId)->first()){
 				$agent = new CrowdAgent;
 				$agent->_id= $agentId;
-				$agent->softwareAgent_id= 'cf2';
+				$agent->softwareAgent_id= 'CF';
 				$agent->platformAgentId = (string) $judgment['worker_id'];
 				$agent->country = $judgment['country'];
 				$agent->region = $judgment['region'];
@@ -129,11 +128,11 @@ class RetrieveJobs extends Command {
 	* @throws CFExceptions when no job is found.
 	*/
 	private function getJob($jobid){
-		if(!$job = Job::where('softwareAgent_id', 'cf2')
+		if(!$job = Job::where('softwareAgent_id', 'CF')
 						->where('platformJobId', intval($jobid)) /* Mongo queries are strictly typed! We saved it as int in Job->store */
 						->first())
 		{
-			$job = Job::where('softwareAgent_id', 'cf2')
+			$job = Job::where('softwareAgent_id', 'CF')
 						->where('platformJobId', (string) $jobid) /* Try this to be sure. */
 						->first();
 		}
@@ -152,44 +151,36 @@ class RetrieveJobs extends Command {
 	/**
 	* @return true if created, false if exists
 	*/
-	private function storeJudgment($judgment, $ourjobid, $activityId, $agentId, $ourjobdomain, $ourjobformat)
+	private function storeJudgment($judgment, $ourjobid, $activityId, $agentId)
 	{
 
 		// If exists return false.
-		if(Workerunit::where('softwareAgent_id', 'cf2')
+		if(Workerunit::where('softwareAgent_id', 'CF')
 			->where('platformWorkerunitId', $judgment['id'])
 			->first())
 			return false;
 
 		try {
+
 			$workerunit = new Workerunit;
-			$workerunit->job_id = $ourjobid;
-			$workerunit->domain = $ourjobdomain;
-			$workerunit->format = $ourjobformat;
-			$workerunit->activity_id = $activityId;
-			$workerunit->crowdAgent_id = $agentId;
-			$workerunit->softwareAgent_id = 'cf2';
-			$workerunit->unit_id = $judgment['unit_data']['uid']; // uid field in the csv we created in $batch->toCFCSV().
-			$workerunit->platformWorkerunitId = $judgment['id'];
-			$workerunit->cfChannel = $judgment['external_type'];
+			$workerunit->activity_id = $activityId;			
+			$workerunit->unit_id = $judgment['unit_data']['uid'];			
 			$workerunit->acceptTime = new MongoDate(strtotime($judgment['started_at']));
-			$workerunit->submitTime = new MongoDate(strtotime($judgment['created_at']));
+			$workerunit->cfChannel = $judgment['external_type'];
 			$workerunit->cfTrust = $judgment['trust'];
 			$workerunit->content = $judgment['data'];
+			$workerunit->crowdAgent_id = $agentId;
+			$workerunit->job_id = $ourjobid;
+			$workerunit->platformWorkerunitId = $judgment['id'];
+			$workerunit->submitTime = new MongoDate(strtotime($judgment['created_at']));
+			$workerunit->documentType = $settings['documentType'];
+			$workerunit->templateType = $settings['templateType'];
+			$workerunit->project = $settings['project'];
+			$workerunit->softwareAgent_id = 'CF';
+
 			Queue::push('Queues\SaveWorkerunit', array('workerunit' => serialize($workerunit)));
 
 			return $workerunit;
-			// TODO: golden
-
-			/*  Possibly also:
-				unit_state (but will be a hassle to update)
-				rejected
-				reviewed
-				tainted
-				golden (todo!)
-				missed
-				webhook_sent_at
-			*/
 
 		} catch (Exception $e) {
 			Log::warning("E:{$e->getMessage()} while saving workerunit with CF id {$judgment['id']} to DB.");

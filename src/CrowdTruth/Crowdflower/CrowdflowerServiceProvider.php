@@ -21,10 +21,10 @@ class CrowdflowerServiceProvider extends ServiceProvider {
 	 */
 	public function boot() {
 		$this->package ( 'crowdtruth/crowdflower' );
-		$this->app ['cf2.retrievejobs'] = $this->app->share ( function () {
+		$this->app ['CF.retrievejobs'] = $this->app->share ( function () {
 			return new RetrieveJobs ();
 		} );
-		$this->commands ( 'cf2.retrievejobs' );
+		$this->commands ( 'CF.retrievejobs' );
 		
 		// Register the route to the webhook
 		Route::any ( 'cfwebhook.php', function () {
@@ -37,7 +37,7 @@ class CrowdflowerServiceProvider extends ServiceProvider {
 		// {
 		// return new Crowdflower;
 		// });
-		$this->app->bind ( 'cf2', function () {
+		$this->app->bind ( 'CF', function () {
 			return new Crowdflower2 ();
 		} );
 	}

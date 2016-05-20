@@ -253,17 +253,6 @@ class Crowdflower2 extends \FrameWork {
 	}
 	private function CFDataToJobConf($CFd, &$jc, &$status) {
 		$jcco = $jc->content;
-	/*	if (isset ( $CFd ['title'] )) {
-			$pos = strpos ( $CFd ['title'], '[[' );
-			if ($pos !== false && $pos > 0) {
-				if (0 == strcmp ( substr ( $CFd ['title'], $pos ), '[[' . $jcco ['type'] ))
-					$jcco ['title'] = $CFd ['title'] . substr ( $jcco ['title'], strpos ( $jcco ['title'], '(entity/' ) );
-				else
-					throw new Exception ( "Wrong type" );
-			} else
-				throw new Exception ( "Missing '[['" );
-		}
-		*/
 		if (isset ( $CFd ['instructions'] ))
 			$jcco ['instructions'] = $CFd ['instructions'];
 		if (isset ( $CFd ['css'] ))
@@ -298,7 +287,7 @@ class Crowdflower2 extends \FrameWork {
 		$data = array ();
 		
 		if (isset ( $jc ['title'] ))
-			$data ['title'] = substr ( $jc ['title'], 0, strpos ( $jc ['title'], '(entity/' ) );
+			$data ['title'] = $jc ['title'];
 		if (isset ( $jc ['css'] ))
 			$data ['css'] = $jc ['css'];
 		if (isset ( $jc ['cml'] ))
